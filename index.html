@@ -423,7 +423,7 @@
     </div>
   </div>
 
-  <div class="adminbar hidden" id="adminbar">🔓 โหมดแอดมิน · แก้ไขชื่อ / Discord ID / Webhook ได้</div>
+  <div class="adminbar hidden" id="adminbar">🔓 โหมดแอดมิน · แก้ไขชื่อ / Discord ID ได้</div>
 
   <div class="photocard" id="photocard">
     <div class="ph-hdr">
@@ -452,16 +452,15 @@
 
   <div class="hookcard" id="hookcard">
     <div class="hookhdr">
-      <div class="t">🔗 Discord Webhook <span class="status-chip unset" id="hook-chip">ยังไม่ตั้ง</span></div>
-      <div class="hooktools">
-        <button class="mini-btn" id="hook-toggle" onclick="toggleHook()">👁 แสดง</button>
-        <button class="mini-btn danger" onclick="clearHook()">🗑 ลบ</button>
-      </div>
+      <div class="t">🔗 ตั้งค่าปลายทาง Discord</div>
     </div>
-    <div class="hookbody hidden" id="hook-body">
-      <input class="hook" id="d-hook" placeholder="วางลิงก์ Discord Webhook ของบ้านนี้..." oninput="setWebhook(this.value)">
+    <div class="hookhint">ตั้ง Webhook ของแต่ละบ้านใน Vercel → Project Settings → Environment Variables<br>บ้าน 1 ใช้ <code>DISCORD_WEBHOOK_1</code> · บ้าน 2 ใช้ <code>DISCORD_WEBHOOK_2</code> ไล่ไปจนถึงบ้าน 6 แล้วกด Redeploy<br>ถ้าเคยตั้ง Webhook ในเว็บบนเครื่องนี้ ให้คัดลอกค่าด้านล่างไปใส่ใน Vercel ก่อน จากนั้นค่อยลบค่าที่เก่าออก<br>สมาชิกทุกคนจะส่งเข้าห้องของบ้านที่เลือกได้ โดยไม่เห็นลิงก์ Webhook</div>
+    <div id="legacy-hook-wrap" class="hookbody" style="display:none">
+      <input class="hook" id="legacy-hook" type="password" readonly aria-label="Webhook เดิมที่บันทึกในเครื่องนี้">
+      <button class="mini-btn" id="legacy-hook-toggle" onclick="toggleLegacyHook()">👁 แสดง</button>
+      <button class="mini-btn" onclick="copyLegacyHook()">📋 คัดลอก</button>
+      <button class="mini-btn danger" onclick="clearLegacyHook()">ลบของเก่า</button>
     </div>
-    <div class="hookhint hidden" id="hook-hint">กด “แสดง” เพื่อกรอกลิงก์ · กด “ลบ” เพื่อเอาออก · ลิงก์จะถูกซ่อนไว้เสมอ</div>
   </div>
 
   <div style="height:14px"></div>
@@ -854,17 +853,13 @@ function renderHouse(){
   nameInp.value=h.name;nameInp.readOnly=!ADMIN;
   document.getElementById('adminbar').classList.toggle('hidden',!ADMIN);
   document.getElementById('hookcard').style.display=ADMIN?'':'none';
+  document.getElementById('legacy-hook-wrap').style.display=h.webhook?'flex':'none';
+  document.getElementById('legacy-hook').value=h.webhook||'';
+  document.getElementById('legacy-hook').type='password';
+  document.getElementById('legacy-hook-toggle').textContent='👁 แสดง';
 
   renderPhoto();
   document.getElementById('mlist').innerHTML=h.members.map((m,mi)=>memberRow(mi,m)).join('');
-
-  const chip=document.getElementById('hook-chip');
-  if(h.webhook){chip.textContent='ตั้งค่าแล้ว';chip.className='status-chip set';}
-  else{chip.textContent='ยังไม่ตั้ง';chip.className='status-chip unset';}
-  document.getElementById('d-hook').value=h.webhook||'';
-  document.getElementById('hook-body').classList.add('hidden');
-  document.getElementById('hook-hint').classList.add('hidden');
-  document.getElementById('hook-toggle').textContent='👁 แสดง';
 
   updateFoot();
 }
@@ -917,13 +912,6 @@ function selectAll(v){state.houses[current].members.forEach(m=>m.sel=v);save();r
 function setName(v){state.houses[current].name=v;save();}
 function setMember(mi,v){state.houses[current].members[mi].name=v;save();}
 function setDid(mi,v){state.houses[current].members[mi].did=v.replace(/[^0-9]/g,'');save();}
-function setWebhook(v){
-  state.houses[current].webhook=v.trim();save();
-  const chip=document.getElementById('hook-chip');
-  if(v.trim()){chip.textContent='ตั้งค่าแล้ว';chip.className='status-chip set';}
-  else{chip.textContent='ยังไม่ตั้ง';chip.className='status-chip unset';}
-}
-
 function readImg(file,cb){const r=new FileReader();r.onload=e=>cb(e.target.result);r.readAsDataURL(file);}
 function pickPhoto(){
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
@@ -933,6 +921,25 @@ function pickPhoto(){
 function clearPhoto(){
   if(!state.houses[current].image){toast('ยังไม่มีรูป','warn');return;}
   state.houses[current].image='';save();renderHouse();toast('ลบรูปแล้ว','info');
+}
+
+function toggleLegacyHook(){
+  const input=document.getElementById('legacy-hook');
+  const button=document.getElementById('legacy-hook-toggle');
+  const reveal=input.type==='password';
+  input.type=reveal?'text':'password';
+  button.textContent=reveal?'🙈 ซ่อน':'👁 แสดง';
+}
+async function copyLegacyHook(){
+  const value=state.houses[current].webhook||'';
+  if(!value){toast('ไม่พบ Webhook เดิมในเครื่องนี้','warn');return;}
+  try{await navigator.clipboard.writeText(value);toast('คัดลอกแล้ว นำไปใส่ใน Vercel Environment Variables','success');}
+  catch(_){const input=document.getElementById('legacy-hook');input.type='text';input.select();document.execCommand('copy');input.type='password';toast('คัดลอกแล้ว นำไปใส่ใน Vercel Environment Variables','success');}
+}
+function clearLegacyHook(){
+  if(!state.houses[current].webhook){toast('ไม่พบ Webhook เดิมในเครื่องนี้','warn');return;}
+  if(!confirm('ลบ Webhook เก่าที่บันทึกไว้ในเครื่องนี้? ตรวจว่าตั้งค่าใน Vercel แล้วก่อนลบ'))return;
+  state.houses[current].webhook='';save();renderHouse();toast('ลบ Webhook เก่าจากเครื่องนี้แล้ว','info');
 }
 
 document.addEventListener('paste',e=>{
@@ -954,21 +961,6 @@ document.addEventListener('paste',e=>{
     if(f&&f.type.indexOf('image')===0){readImg(f,d=>{state.houses[current].image=d;save();renderHouse();toast('วางรูปแล้ว','success');});}
   });
 })();
-
-function toggleHook(){
-  const body=document.getElementById('hook-body');
-  const hint=document.getElementById('hook-hint');
-  const btn=document.getElementById('hook-toggle');
-  const hidden=body.classList.contains('hidden');
-  body.classList.toggle('hidden',!hidden);
-  hint.classList.toggle('hidden',!hidden);
-  btn.textContent=hidden?'🙈 ซ่อน':'👁 แสดง';
-}
-function clearHook(){
-  if(!state.houses[current].webhook){toast('ยังไม่มีลิงก์ให้ลบ','warn');return;}
-  if(!confirm('ลบลิงก์ Webhook ของบ้านนี้?'))return;
-  state.houses[current].webhook='';save();renderHouse();toast('ลบลิงก์แล้ว','info');
-}
 
 function updateFoot(){
   const n=state.houses[current].members.filter(m=>m.sel).length;
@@ -994,36 +986,21 @@ function tagText(h){
   const mentions=sel.length?sel.map((m,i)=>`${i+1}. ${mentionOf(m)}`).join('\n'):'(ยังไม่ได้เลือกใคร)';
   return `**🏠 ${h.name}** — แท็ก ${sel.length} คน\n${mentions}\n> 🕒 ${d}`;
 }
-function validHook(u){return /^https:\/\/(discord(app)?\.com)\/api\/webhooks\//i.test((u||'').trim());}
-function dataURLtoBlob(durl){
-  const [head,b64]=durl.split(',');
-  const mime=(head.match(/:(.*?);/)||[])[1]||'image/png';
-  const bin=atob(b64);const len=bin.length;const arr=new Uint8Array(len);
-  for(let i=0;i<len;i++)arr[i]=bin.charCodeAt(i);
-  return new Blob([arr],{type:mime});
-}
-function extOf(mime){return (mime.split('/')[1]||'png').replace('jpeg','jpg');}
-
 async function sendTag(){
   const h=state.houses[current];
   if(!h.image){toast('ต้องแนบรูปก่อนถึงจะส่งได้','warn');return;}
   const sel=h.members.filter(m=>m.sel);
   if(!sel.length){toast('ยังไม่ได้เลือกคนที่จะแท็ก','warn');return;}
-  if(!validHook(h.webhook)){toast('แอดมินยังไม่ได้ตั้งลิงก์ Webhook','warn');return;}
   toast('กำลังส่งเข้า Discord...','loading');
   const ids=sel.filter(m=>m.did).map(m=>m.did);
-  const blob=dataURLtoBlob(h.image);
-  const payload={content:tagText(h),username:'ᴅɪᴀᴍᴏɴᴅʜᴇᴀᴅ',allowed_mentions:{parse:[],users:ids}};
-  const fd=new FormData();
-  fd.append('payload_json',JSON.stringify(payload));
-  fd.append('files[0]',blob,'house.'+extOf(blob.type));
   try{
-    const res=await fetch(h.webhook,{method:'POST',body:fd});
-    if(!res.ok)throw new Error('HTTP '+res.status);
+    const res=await fetch('/api/send-discord',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({house:current+1,content:tagText(h),users:ids,image:h.image})});
+    const result=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(result.error||'ส่งไม่สำเร็จ ('+res.status+')');
     toast('ส่งแท็ก + รูป เข้า Discord สำเร็จ','success');
     h.members.forEach(m=>m.sel=false);
     h.image='';save();renderHouse();
-  }catch(e){toast('ส่งไม่สำเร็จ ('+e.message+')','error');}
+  }catch(e){toast(e.message==='ยังไม่ได้ตั้งค่า Webhook ของบ้านนี้'?'แอดมินยังไม่ได้ตั้ง Webhook บ้านนี้ใน Vercel':e.message,'error');}
 }
 function copyTag(){
   const txt=tagText(state.houses[current]).replace(/\*\*/g,'').replace(/^> /gm,'');
