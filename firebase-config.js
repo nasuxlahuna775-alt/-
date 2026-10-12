@@ -1,5 +1,6 @@
 // Firebase connection for Diamondhead. Keep this file beside index.html.
 (function () {
+  window.firebaseAdminUid = "hfsaRwIRcAYZesSrRTyc23FsDEB2"; // Set this to the admin Firebase Authentication UID.
   const firebaseConfig = {
     apiKey: "AIzaSyBwKXYJji4qQNoOvhcqpdBWHdpPLQ4sXJ0",
     authDomain: "tarsaray1.firebaseapp.com",

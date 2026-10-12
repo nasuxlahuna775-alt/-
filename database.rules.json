@@ -1,5 +1,9 @@
 {
   "rules": {
+    "sharedState": {
+      ".read": true,
+      ".write": "auth != null && auth.uid === 'hfsaRwIRcAYZesSrRTyc23FsDEB2'"
+    },
     "backups": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",

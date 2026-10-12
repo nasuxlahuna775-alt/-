@@ -35,20 +35,19 @@
 ### เปลี่ยนรหัสแอดมิน
 เปิดไฟล์ `index.html` → ค้นหาบรรทัด `const ADMIN_PIN='090889';` → แก้เลขในเครื่องหมายคำพูด
 
-## ตั้งค่าสำรองข้อมูล Firebase
-1. ใน Firebase Console ของโปรเจกต์ `tarsaray1` เปิด **Authentication** → **Sign-in method** → เปิด **Email/Password**
-2. ไปที่ **Authentication** → **Users** → เพิ่มบัญชีแอดมินด้วยอีเมลและรหัสผ่านของคุณ
-3. ไปที่ **Realtime Database** → **Rules** แล้ววางเนื้อหาจากไฟล์ `database.rules.json` จากนั้นกด **Publish**
-4. ใน **Authentication** → **Settings** → **Authorized domains** ให้เพิ่มโดเมน GitHub Pages ของเว็บ (เช่น `username.github.io`)
-5. ตรวจว่า `firebase-config.js` อยู่โฟลเดอร์เดียวกับ `index.html` จากนั้นเปิดเว็บ กดปุ่มแอดมิน → ใส่ PIN → กด **สำรองตอนนี้** และเข้าสู่ระบบ Firebase
+## ตั้งค่า Firebase และซิงก์ข้อมูลร่วม
+1. ใน Firebase Console ของโปรเจกต์ `tarsaray1` เปิด **Authentication → Sign-in method → Email/Password** แล้วสร้างบัญชีแอดมินหนึ่งบัญชี
+2. ใน Firebase Console → Authentication → Users คัดลอก UID ของบัญชีแอดมิน แล้วใช้ UID เดียวกันใน `firebase-config.js` และ `database.rules.json` (ตั้งค่าไว้แล้วในไฟล์ชุดนี้)
+3. ไปที่ **Realtime Database → Rules** แล้วเผยแพร่กฎจาก `database.rules.json` หากฐานข้อมูลมีแอปอื่นใช้อยู่ ให้รวมกฎกับของเดิมก่อน
+4. ใน **Authentication → Settings → Authorized domains** เพิ่ม `dmh-pied.vercel.app` (และ `username.github.io` ถ้าใช้ GitHub Pages)
+5. อัปโหลดไฟล์ทั้งหมด แล้ว deploy เวอร์ชันใหม่บน Vercel
 
-ปุ่ม **กู้คืนล่าสุด** จะกู้คืนชื่อบ้าน โลโก้ และรายชื่อ/Discord ID จากบัญชี Firebase เดิม ข้อมูลจะถูกสำรองเมื่อกดปุ่มเท่านั้น
+เมื่อแอดมินกด 🔒 ใส่ PIN และเข้าสู่ระบบ Firebase แล้ว การแก้ชื่อบ้าน/สมาชิกจะซิงก์ให้ผู้เข้าชมทุกคนแบบเรียลไทม์ ผู้เข้าชมทั่วไปอ่านข้อมูลร่วมได้ แต่เขียนไม่ได้ ปุ่มสำรอง/กู้คืนยังใช้สำหรับสำรองส่วนตัวตามบัญชี Firebase
 
-การสำรองนี้ไม่เก็บ Discord Webhook และรูปที่แนบส่งเข้า Discord เพื่อไม่ส่งข้อมูลลับและไฟล์ชั่วคราวขึ้นฐานข้อมูล ส่วนข้อมูลที่กู้คืนจะไม่เขียนทับ Webhook และรูปที่อยู่ในเครื่อง
----
+ข้อมูลที่อ่านร่วมได้ประกอบด้วยโลโก้ ชื่อบ้าน ชื่อสมาชิก และ Discord ID; Webhook และรูปแนบไม่ถูกส่งขึ้น Firebase
 
 ## หมายเหตุ
-- ข้อมูลในเว็บยังบันทึกในเครื่อง (localStorage) ตามเดิม การสำรองไป Firebase ทำเมื่อกดปุ่มเท่านั้น โดยเก็บชื่อบ้าน โลโก้ ชื่อสมาชิก และ Discord ID
+- localStorage ใช้เก็บสำเนาในเครื่อง; ข้อมูลหลักอ่านจาก Firebase เพื่อให้ผู้ใช้เห็นข้อมูลชุดเดียวกัน
 - Webhook และรูปแนบชั่วคราวไม่อยู่ในข้อมูลสำรอง; กู้คืนแล้ว Webhook และรูปที่บันทึกในเครื่องจะคงเดิม
 - การสำรองแต่ละครั้งจะสร้างชุดข้อมูลใหม่ในบัญชี Firebase ที่เข้าสู่ระบบ ต้องใช้บัญชีเดิมเมื่อต้องการกู้คืน
 - ถ้าโปรเจกต์ Firebase นี้มีแอปอื่นใช้ Realtime Database อยู่ ให้รวมกฎใน `database.rules.json` เข้ากับกฎเดิมก่อนกด Publish

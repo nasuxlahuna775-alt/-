@@ -50,12 +50,12 @@
     background:radial-gradient(circle,rgba(34,211,238,.28),rgba(168,85,247,.12) 45%,transparent 66%);
     animation:glowpulse 3.6s ease-in-out infinite}
   @keyframes glowpulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.28);opacity:1}}
-  .intro-diamond{font-size:78px;transform-style:preserve-3d;animation:gem 4.4s ease-in-out infinite,gemglow 2.6s ease-in-out infinite}
-  .intro-logo{display:grid;place-items:center;animation:floaty2 3.8s ease-in-out infinite}
-  .intro-logo img{width:122px;height:122px;object-fit:contain;border-radius:22px;box-shadow:0 0 32px -4px rgba(34,211,238,.55)}
+  .intro-diamond{width:150px;height:150px;display:grid;place-items:center;font-size:0;transform-style:preserve-3d;
+    animation:gem 5.2s ease-in-out infinite,gemglow 2.8s ease-in-out infinite}
+  .intro-diamond svg{width:132px;height:138px;overflow:visible;filter:drop-shadow(0 0 15px rgba(34,211,238,.55))}
+  .intro-diamond .gem-glint{transform-origin:center;animation:gemglint 2.4s ease-in-out infinite alternate}
+  @keyframes gemglint{from{opacity:.35;transform:scale(.82)}to{opacity:1;transform:scale(1.12)}}
   @keyframes floaty2{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
-  .logo-tools{display:none;gap:8px;margin:0 0 26px;justify-content:center}
-  .logo-tools.show{display:flex}
   @keyframes gemglow{0%,100%{filter:drop-shadow(0 0 24px rgba(34,211,238,.55))}50%{filter:drop-shadow(0 0 46px rgba(168,85,247,.85))}}
   .intro-ring{position:absolute;inset:0;border-radius:50%;padding:2px;
     background:conic-gradient(from 0deg,#22d3ee,#a855f7,#f472b6,#facc15,#34d399,#22d3ee);
@@ -70,7 +70,8 @@
   @keyframes radar{0%{transform:scale(.55);opacity:.85;border-color:rgba(34,211,238,.7)}100%{transform:scale(3.6);opacity:0;border-color:rgba(168,85,247,.15)}}
   @keyframes spin2{to{transform:rotate(360deg)}}
   @keyframes gem{0%{transform:translateY(0) rotateY(0deg)}50%{transform:translateY(-14px) rotateY(180deg)}100%{transform:translateY(0) rotateY(360deg)}}
-  .intro h1{position:relative;font-size:50px;letter-spacing:6px;margin:0 0 14px;background-size:220% auto;
+  .intro h1{position:relative;width:100%;max-width:100%;white-space:nowrap;font-size:clamp(22px,7.6vw,50px);
+    letter-spacing:clamp(1px,1vw,6px);margin:0 0 14px;background-size:220% auto;
     animation:titleIn 1s .3s cubic-bezier(.2,.9,.3,1) both,shimmer 4.5s 1.3s linear infinite,glitch 4.2s 1.6s infinite}
   @keyframes glitch{
     0%,90%,100%{transform:none;text-shadow:0 0 18px rgba(34,211,238,.4)}
@@ -99,24 +100,105 @@
   .enter-btn:hover .arr{transform:translateX(6px)}
   .intro-foot{position:absolute;bottom:24px;left:0;right:0;color:#55658a;font-size:12px;letter-spacing:2px;
     animation:fadeUp .9s 1s both}
-  @media(max-width:480px){.intro h1{font-size:34px;letter-spacing:3px}.intro-diamond{font-size:64px}}
+  @media(max-width:480px){.intro h1{letter-spacing:1.5px}.intro-diamond{font-size:64px}}
 
-  .houses{display:grid;grid-template-columns:1fr;gap:20px}
-  @media(min-width:720px){.houses{grid-template-columns:1fr 1fr}}
-  .hcard{position:relative;border:1px solid var(--line);border-radius:26px;overflow:hidden;cursor:pointer;
-    background:var(--panel);backdrop-filter:blur(10px);transition:.24s;padding:40px 38px;
-    display:flex;flex-direction:column;gap:24px;min-height:220px;justify-content:space-between}
+  .home-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:6px 0 28px}
+  .home-copy{min-width:0}
+  .home-kicker{font-size:10px;font-weight:800;letter-spacing:3px;color:var(--cyan);margin:0 0 7px}
+  .home-title{font-size:clamp(23px,4vw,32px);letter-spacing:3px;text-align:left;margin:0;background:var(--grad);
+    -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(34,211,238,.25))}
+  .home-desc{font-size:13px;color:var(--muted);margin:8px 0 0;line-height:1.6}
+  .home-sectionbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+  .home-sectionbar strong{display:block;font-size:16px}
+  .home-sectionbar small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+  .house-count{font-size:11px;color:#a5b4fc;border:1px solid rgba(129,140,248,.25);background:rgba(99,102,241,.1);
+    border-radius:999px;padding:6px 10px;white-space:nowrap}
+  .houses{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;perspective:1100px}
+  .hcard{position:relative;border:1px solid rgba(56,189,248,.24);border-radius:22px;overflow:hidden;cursor:pointer;
+    isolation:isolate;transform-style:preserve-3d;background:linear-gradient(145deg,rgba(13,27,48,.97),rgba(8,15,29,.96));backdrop-filter:blur(12px);
+    transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .28s,box-shadow .28s;padding:25px 27px;
+    display:flex;flex-direction:column;gap:22px;min-height:190px;justify-content:space-between;
+    animation:houseEnter .62s cubic-bezier(.2,.8,.2,1) var(--delay,0ms) both}
+  @keyframes houseEnter{from{opacity:0;transform:translateY(24px) scale(.965);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+  @keyframes houseLaunch{0%{transform:translateY(-5px) scale(1);filter:brightness(1)}45%{transform:translateY(-10px) scale(1.035);filter:brightness(1.2)}100%{transform:translateY(-5px) scale(1.025);filter:brightness(1.12)}}
   .hcard::before{content:'';position:absolute;inset:0;border-radius:20px;padding:1px;pointer-events:none;
-    background:linear-gradient(135deg,var(--hc),transparent 55%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor;mask-composite:exclude;opacity:.6;transition:.24s}
-  .hcard:hover{transform:translateY(-5px);box-shadow:0 20px 44px -18px var(--hc)}
+    background:linear-gradient(135deg,#38bdf8,rgba(59,130,246,.25) 48%,transparent 78%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;opacity:.65;transition:opacity .28s}
+  .hcard::after{content:'';position:absolute;z-index:-1;inset:0;pointer-events:none;opacity:0;
+    background:radial-gradient(260px circle at var(--pointer-x,50%) var(--pointer-y,50%),rgba(56,189,248,.2),transparent 72%);
+    transition:opacity .28s}
+  .hcard:hover{transform:translateY(-6px);border-color:rgba(56,189,248,.55);box-shadow:0 22px 48px -24px rgba(14,165,233,.8),0 0 24px -14px rgba(59,130,246,.75)}
+  .hcard:active{transform:translateY(-1px) scale(.985)}
+  .hcard:hover::after{opacity:1}
+  .hcard.opening{pointer-events:none;animation:houseLaunch .42s cubic-bezier(.16,1,.3,1) both;border-color:#67e8f9;
+    box-shadow:0 0 0 1px rgba(103,232,249,.28),0 0 44px -8px rgba(56,189,248,.9),0 24px 55px -20px rgba(37,99,235,.8)}
+  .hcard.opening::after{opacity:1;background:radial-gradient(circle at 50% 48%,rgba(103,232,249,.38),rgba(37,99,235,.12) 42%,transparent 75%)}
   .hcard:hover::before{opacity:1}
-  .hcard .badge{width:96px;height:96px;border-radius:28px;display:grid;place-items:center;
-    font-weight:800;font-size:46px;color:#04121c;background:var(--hc);box-shadow:0 0 38px -4px var(--hc)}
-  .hcard .hn{font-weight:800;font-size:34px;letter-spacing:.5px}
-  .hcard .hcnt{font-size:14.5px;color:var(--muted);margin-top:8px}
-  .hcard .go{font-size:16px;font-weight:700;color:var(--cyan)}
+  .hcard .badge{width:70px;height:70px;border-radius:21px;display:grid;place-items:center;
+    font-weight:850;font-size:34px;color:#04121c;background:var(--hc);box-shadow:0 0 32px -7px var(--hc);transition:transform .24s}
+  .hcard:hover .badge{transform:scale(1.06) rotate(-3deg)}
+  .hcard .hn{font-weight:800;font-size:25px;letter-spacing:.2px;line-height:1.25}
+  .hcard .hcnt{font-size:12px;color:var(--muted);margin-top:7px}
+  .hcard .go{position:relative;isolation:isolate;overflow:hidden;font-size:13px;font-weight:800;color:#b8edff;
+    border:1px solid rgba(56,189,248,.32);background:linear-gradient(135deg,rgba(14,165,233,.2),rgba(37,99,235,.16));
+    border-radius:999px;padding:10px 15px;transition:transform .25s,border-color .25s,box-shadow .25s}
+  .hcard .go::before{content:'';position:absolute;z-index:-1;inset:0;transform:translateX(-130%) skewX(-20deg);
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.3),transparent);transition:transform .55s ease}
+  .hcard .go span{display:inline-block;transition:transform .25s}
+  .hcard:hover .go{transform:translateY(-2px);border-color:rgba(56,189,248,.7);box-shadow:0 6px 18px -9px #38bdf8}
+  .hcard:hover .go::before{transform:translateX(130%) skewX(-20deg)}
+  .hcard:hover .go span{transform:translateX(4px)}
+  #view-house.active{animation:detailReveal .48s cubic-bezier(.2,.8,.2,1)}
+  @keyframes detailReveal{from{opacity:0;transform:translateY(18px) scale(.985);filter:blur(4px)}to{opacity:1;transform:none;filter:blur(0)}}
+  @media(prefers-reduced-motion:reduce){.hcard,.hcard::before,.hcard::after,.hcard .badge,.hcard .go,.hcard .go::before,.hcard .go span,#view-house.active{transition:none!important;animation:none!important}}
+  .portal-fx{position:fixed;inset:0;z-index:80;pointer-events:none;overflow:hidden;opacity:1;transition:opacity .38s ease}
+  .portal-fx.exit{opacity:0}
+  .portal-shade{position:absolute;inset:0;background:radial-gradient(circle at var(--portal-x) var(--portal-y),rgba(8,32,61,.2),rgba(2,6,16,.84) 78%);opacity:0;transition:opacity .34s ease}
+  .portal-fx.active .portal-shade{animation:portalShade 1.08s ease-in-out forwards}
+  .portal-rings{position:absolute;left:var(--portal-x);top:var(--portal-y);width:min(88vmax,920px);aspect-ratio:1;
+    border-radius:50%;transform:translate(-50%,-50%) scale(.035) rotate(-80deg);opacity:0;
+    background:radial-gradient(circle,rgba(34,211,238,.18),rgba(37,99,235,.1) 38%,transparent 67%);
+    filter:drop-shadow(0 0 32px color-mix(in srgb,var(--portal-color),transparent 35%));}
+  .portal-fx.active .portal-rings{animation:portalOpenClose 1.08s cubic-bezier(.16,1,.3,1) forwards}
+  .portal-rings::before,.portal-rings::after{content:'';position:absolute;inset:2%;border:2px solid rgba(103,232,249,.78);border-radius:50%;
+    box-shadow:0 0 18px rgba(34,211,238,.65),inset 0 0 22px rgba(59,130,246,.28)}
+  .portal-rings::before{inset:13%;border-width:1px;border-color:rgba(167,139,250,.74);border-style:dashed}
+  .portal-rings::after{inset:27%;border-width:3px;border-color:color-mix(in srgb,var(--portal-color),white 20%);border-left-color:transparent;border-bottom-color:rgba(56,189,248,.25)}
+  .portal-orbit{position:absolute;inset:7%;border:1px solid rgba(56,189,248,.62);border-radius:50%;transform:rotate(-24deg) scaleY(.72);}
+  .portal-orbit::before{content:'';position:absolute;left:10%;top:8%;width:9px;height:9px;border-radius:50%;background:#c8f7ff;
+    box-shadow:0 0 12px 4px #38bdf8,0 0 32px 8px rgba(99,102,241,.65)}
+  .portal-orbit.orbit-two{inset:19%;border-color:rgba(34,211,238,.58);transform:rotate(38deg) scaleY(.84)}
+  .portal-orbit.orbit-two::before{left:auto;top:auto;right:4%;bottom:17%;width:6px;height:6px;background:#c4b5fd;box-shadow:0 0 15px 5px #818cf8}
+  .portal-core{position:absolute;left:var(--portal-x);top:var(--portal-y);display:grid;justify-items:center;gap:4px;
+    transform:translate(-50%,-50%) scale(.25);opacity:0;color:#e0fbff;text-shadow:0 0 20px #38bdf8;white-space:nowrap}
+  .portal-fx.active .portal-core{animation:portalCore 1.02s cubic-bezier(.16,1,.3,1) .03s forwards}
+  .portal-number{font-size:clamp(46px,12vw,84px);font-weight:900;line-height:1;background:linear-gradient(145deg,#fff,#67e8f9 42%,#818cf8);
+    -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(56,189,248,.9))}
+  .portal-label{font-size:10px;letter-spacing:4px;font-weight:800;color:#a5f3fc}
+  .portal-particles{position:absolute;left:var(--portal-x);top:var(--portal-y);width:0;height:0}
+  .portal-particles i{position:absolute;left:0;top:0;color:#cffafe;font-style:normal;font-size:17px;opacity:0;
+    text-shadow:0 0 12px #38bdf8;transform:rotate(var(--angle)) translateX(0) scale(.2)}
+  .portal-fx.active .portal-particles i{animation:portalParticle .72s cubic-bezier(.12,.78,.2,1) var(--delay) forwards}
+  .portal-flash{position:absolute;inset:0;opacity:0;background:radial-gradient(circle at var(--portal-x) var(--portal-y),rgba(224,252,255,.88),rgba(56,189,248,.22) 8%,transparent 34%)}
+  .portal-fx.active .portal-flash{animation:portalFlash .78s ease-out forwards}
+  .portal-flash::after{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(circle at var(--portal-x) var(--portal-y),rgba(255,255,255,.95),rgba(103,232,249,.46) 5%,transparent 31%)}
+  .portal-fx.active .portal-flash::after{animation:portalCollapseFlash 1.08s ease-in forwards}
+  @keyframes portalShade{0%,8%{opacity:0}20%,72%{opacity:1}100%{opacity:0}}
+  @keyframes portalOpenClose{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.035) rotate(-80deg)}
+    14%{opacity:1;transform:translate(-50%,-50%) scale(.52) rotate(10deg)}
+    48%{opacity:1;transform:translate(-50%,-50%) scale(1.22) rotate(190deg)}
+    66%{opacity:.96;transform:translate(-50%,-50%) scale(1.28) rotate(255deg)}
+    88%{opacity:.94;transform:translate(-50%,-50%) scale(.2) rotate(420deg)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(.012) rotate(520deg)}}
+  @keyframes portalCore{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-18deg)}16%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(3deg)}66%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(.02) rotate(28deg)}}
+  @keyframes portalParticle{0%{opacity:0;transform:rotate(var(--angle)) translateX(0) scale(.15)}18%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateX(var(--travel)) scale(1.15)}}
+  @keyframes portalFlash{0%{opacity:0}15%{opacity:.92}100%{opacity:0}}
+  @keyframes portalCollapseFlash{0%,69%{opacity:0}79%{opacity:.95}100%{opacity:0}}
+  @media(prefers-reduced-motion:reduce){.portal-fx,.portal-fx *{animation:none!important;transition:none!important}}
   .hrow{display:flex;align-items:center;justify-content:space-between}
+  @media(max-width:520px){.home-head{align-items:flex-start;margin:2px 0 21px}.home-title{letter-spacing:2px}
+    .houses{grid-template-columns:1fr;gap:12px}.hcard{min-height:168px;padding:22px 23px;border-radius:19px}}
 
   .topnav{display:flex;align-items:center;gap:10px;margin-bottom:14px}
   .back{border:1px solid var(--line);background:var(--panel2);color:var(--txt);width:42px;height:42px;
@@ -288,27 +370,44 @@
     <div class="intro-ring"></div>
     <div class="intro-ring r2"></div>
     <div class="intro-ring r3"></div>
-    <div class="intro-diamond" id="gemHolder">💎</div>
+    <div class="intro-diamond" id="gemHolder">
+      <svg viewBox="0 0 160 160" role="img" aria-label="เพชรสีฟ้า">
+        <defs>
+          <linearGradient id="gemBody" x1="18%" y1="5%" x2="82%" y2="100%"><stop stop-color="#c8f7ff"/><stop offset=".28" stop-color="#38d9f4"/><stop offset=".68" stop-color="#4b8dff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+          <linearGradient id="gemFacet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#73eaff" stop-opacity=".12"/></linearGradient>
+          <linearGradient id="gemSide" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a8f5ff" stop-opacity=".9"/><stop offset="1" stop-color="#2476ef" stop-opacity=".35"/></linearGradient>
+        </defs>
+        <path d="M31 48 48 27h64l17 21-49 80z" fill="url(#gemBody)" stroke="#d9fbff" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M31 48h98L112 27H48z" fill="url(#gemFacet)" opacity=".88"/>
+        <path d="m31 48 33 0 16 80z" fill="#1baad8" fill-opacity=".34"/>
+        <path d="m129 48-33 0-16 80z" fill="url(#gemSide)"/>
+        <path d="M48 27 64 48l16 80 16-80 16-21M31 48h98M64 48h32" fill="none" stroke="#e8fdff" stroke-opacity=".86" stroke-width="2.2" stroke-linejoin="round"/>
+        <path class="gem-glint" d="m80 8 4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#fff"/>
+        <path d="m20 77 2.5 5.5L28 85l-5.5 2.5L20 93l-2.5-5.5L12 85l5.5-2.5zM140 89l2.5 5.5L148 97l-5.5 2.5L140 105l-2.5-5.5L132 97l5.5-2.5z" fill="#67e8f9" opacity=".92"/>
+      </svg>
+    </div>
   </div>
   <h1>ᴅɪᴀᴍᴏɴᴅʜᴇᴀᴅ</h1>
-  <div class="logo-tools" id="logoTools">
-    <button class="mini-btn" onclick="pickLogo()">📷 เปลี่ยนโลโก้</button>
-    <button class="mini-btn danger" id="logoDel" onclick="clearLogo()">🗑 ลบโลโก้</button>
-  </div>
   <div class="tag">ระบบเลือกบ้าน แท็กสมาชิก และส่งรูปเข้า Discord<br>กดเริ่มเพื่อเลือกบ้านของคุณ</div>
   <button class="enter-btn" onclick="enterApp()"><span>เข้าสู่ระบบ</span> <span class="arr">→</span></button>
   <div class="intro-foot">ᴅɪᴀᴍᴏɴᴅʜᴇᴀᴅ · 2026</div>
 </section>
 
 <section class="view" id="view-home">
-  <h1>ᴅɪᴀᴍᴏɴᴅʜᴇᴀᴅ</h1>
-  <div style="height:14px"></div>
+  <header class="home-head">
+    <div class="home-copy">
+      <p class="home-kicker">COMMUNITY SPACE</p>
+      <h1 class="home-title">ᴅɪᴀᴍᴏɴᴅʜᴇᴀᴅ</h1>
+      <p class="home-desc">เลือกบ้านของคุณ แล้วชวนสมาชิกมาร่วมกิจกรรม</p>
+    </div>
+  </header>
   <div class="cloud-tools hidden" id="cloudTools">
     <span class="cloud-status" id="cloudStatus">สำรองข้อมูลกับ Firebase</span>
     <button class="mini-btn" onclick="startFirebaseAction('backup')">☁️ สำรองตอนนี้</button>
     <button class="mini-btn" onclick="startFirebaseAction('restore')">↩️ กู้คืนล่าสุด</button>
     <button class="mini-btn hidden" id="firebaseSignOut" onclick="signOutFirebase()">ออกจากบัญชี</button>
   </div>
+  <div class="home-sectionbar"><div><strong>เลือกบ้าน</strong><small>แตะการ์ดเพื่อดูสมาชิกและเลือกคนที่จะแท็ก</small></div><span class="house-count" id="homeHouseCount">6 บ้าน</span></div>
   <div class="houses" id="houses"></div>
 </section>
 
@@ -467,14 +566,58 @@
 
 const HC=['#22d3ee','#a78bfa','#f472b6','#facc15','#34d399','#fb923c'];
 const KEY='diamondhead_v3';
-let firebaseAuth=window.firebaseAuth||null,firebaseDb=window.firebaseDb||null,pendingFirebaseAction='';
+let firebaseAuth=window.firebaseAuth||null,firebaseDb=window.firebaseDb||null,pendingFirebaseAction='',pendingAdminUnlock=false;
+const ADMIN_UID=(window.firebaseAdminUid||'').trim();
+let sharedStateReady=false,sharedWriteTimer=null,sharedListenerAttached=false;
+function isFirebaseAdmin(){return !!(firebaseAuth&&firebaseAuth.currentUser&&ADMIN_UID&&firebaseAuth.currentUser.uid===ADMIN_UID);}
+function sharedPayload(){
+  return {logo:state.logo||'',houses:state.houses.map(h=>({color:h.color,name:h.name,members:(h.members||[]).map(m=>({name:m.name||'',did:m.did||''}))}))};
+}
+function applySharedPayload(data){
+  if(!data||!Array.isArray(data.houses))return;
+  const localHouses=state&&state.houses?state.houses:[];
+  state=migrate({logo:data.logo||'',houses:data.houses.map((saved,i)=>{
+    const local=localHouses[i]||{};
+    return {...local,...saved,image:local.image||'',webhook:local.webhook||'',members:(saved.members||[]).map(m=>({...m,sel:false}))};
+  })});
+  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  renderHome();renderIntro();if(current>=0)renderHouse();
+}
+function connectSharedState(){
+  if(!firebaseDb||sharedListenerAttached)return;
+  sharedListenerAttached=true;
+  firebaseDb.ref('sharedState').on('value',snap=>{
+    const record=snap.val();
+    if(record&&record.data){applySharedPayload(record.data);sharedStateReady=true;setCloudStatus('เชื่อมข้อมูลร่วมแล้ว');}
+    else{sharedStateReady=false;setCloudStatus('ยังไม่มีข้อมูลร่วมใน Firebase');}
+  },err=>{console.error(err);setCloudStatus('เชื่อม Firebase ไม่สำเร็จ');});
+}
+function setCloudStatus(message){const el=document.getElementById('cloudStatus');if(el)el.textContent=message;}
+async function publishSharedState(){
+  if(!isFirebaseAdmin()||!firebaseDb)return;
+  try{
+    await firebaseDb.ref('sharedState').set({updatedAt:firebase.database.ServerValue.TIMESTAMP,data:sharedPayload()});
+    sharedStateReady=true;setCloudStatus('ซิงก์ข้อมูลร่วมแล้ว');
+  }catch(e){console.error(e);setCloudStatus('บันทึกข้อมูลร่วมไม่สำเร็จ');toast('บันทึกข้อมูลร่วมไม่สำเร็จ: '+(e.code||e.message),'error');}
+}
 if(firebaseAuth){
   firebaseAuth.onAuthStateChanged(user=>{
     const signOut=document.getElementById('firebaseSignOut');
-    const status=document.getElementById('cloudStatus');
     if(signOut)signOut.classList.toggle('hidden',!user);
-    if(status)status.textContent=user?'Firebase: '+user.email:'สำรองข้อมูลกับ Firebase';
+    if(user){
+      connectSharedState();
+      if(pendingAdminUnlock){
+        pendingAdminUnlock=false;
+        if(isFirebaseAdmin()){
+          ADMIN=true;applyAdmin();
+          firebaseDb.ref('sharedState').once('value').then(snap=>{if(!snap.exists())publishSharedState();});
+          toast('เข้าสู่โหมดแอดมินแล้ว','success');
+        }else{ADMIN=false;applyAdmin();toast('บัญชีนี้ไม่มีสิทธิ์แอดมิน','error');}
+      }
+    }
+    setCloudStatus(user?'บัญชี Firebase: '+user.email:'ข้อมูลจะซิงก์จาก Firebase');
   });
+  connectSharedState();
 }
 function openFirebaseModal(){
   document.getElementById('firebaseErr').textContent='';
@@ -559,7 +702,12 @@ function openPin(){
 function closePin(){document.getElementById('pinModal').classList.remove('show');}
 function submitPin(){
   const inp=document.getElementById('pinInput');
-  if(inp.value===ADMIN_PIN){closePin();ADMIN=true;applyAdmin();toast('เข้าโหมดแอดมินแล้ว','success');}
+  if(inp.value===ADMIN_PIN){
+    closePin();
+    if(isFirebaseAdmin()){ADMIN=true;applyAdmin();toast('เข้าโหมดแอดมินแล้ว','success');}
+    else if(firebaseAuth){pendingAdminUnlock=true;openFirebaseModal();}
+    else{toast('Firebase ยังเชื่อมต่อไม่ได้','error');}
+  }
   else{
     document.getElementById('pinErr').textContent='❌ รหัสผ่านไม่ถูกต้อง';
     inp.value='';inp.focus();
@@ -580,18 +728,22 @@ function applyAdmin(){
 
 function renderIntro(){
   const g=document.getElementById('gemHolder');
-  const tools=document.getElementById('logoTools');
-  const del=document.getElementById('logoDel');
   if(!g)return;
-  if(state.logo){
-    g.className='intro-logo';
-    g.innerHTML='<img src="'+state.logo+'" alt="logo">';
-  }else{
-    g.className='intro-diamond';
-    g.textContent='💎';
-  }
-  if(tools)tools.classList.toggle('show',ADMIN);
-  if(del)del.style.display=state.logo?'':'none';
+  g.className='intro-diamond';
+  g.innerHTML=`<svg viewBox="0 0 160 160" role="img" aria-label="เพชรสีฟ้า">
+    <defs>
+      <linearGradient id="gemBody" x1="18%" y1="5%" x2="82%" y2="100%"><stop stop-color="#c8f7ff"/><stop offset=".28" stop-color="#38d9f4"/><stop offset=".68" stop-color="#4b8dff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+      <linearGradient id="gemFacet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#73eaff" stop-opacity=".12"/></linearGradient>
+      <linearGradient id="gemSide" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a8f5ff" stop-opacity=".9"/><stop offset="1" stop-color="#2476ef" stop-opacity=".35"/></linearGradient>
+    </defs>
+    <path d="M31 48 48 27h64l17 21-49 80z" fill="url(#gemBody)" stroke="#d9fbff" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M31 48h98L112 27H48z" fill="url(#gemFacet)" opacity=".88"/>
+    <path d="m31 48 33 0 16 80z" fill="#1baad8" fill-opacity=".34"/>
+    <path d="m129 48-33 0-16 80z" fill="url(#gemSide)"/>
+    <path d="M48 27 64 48l16 80 16-80 16-21M31 48h98M64 48h32" fill="none" stroke="#e8fdff" stroke-opacity=".86" stroke-width="2.2" stroke-linejoin="round"/>
+    <path class="gem-glint" d="m80 8 4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#fff"/>
+    <path d="m20 77 2.5 5.5L28 85l-5.5 2.5L20 93l-2.5-5.5L12 85l5.5-2.5zM140 89l2.5 5.5L148 97l-5.5 2.5L140 105l-2.5-5.5L132 97l5.5-2.5z" fill="#67e8f9" opacity=".92"/>
+  </svg>`;
 }
 
 function pickLogo(){
@@ -614,28 +766,65 @@ function buildDefault(){
     members:Array.from({length:5},()=>({name:'',did:'',sel:false}))}))};
 }
 function load(){try{const d=JSON.parse(localStorage.getItem(KEY));return(d&&d.houses)?d:null;}catch(e){return null;}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  if(ADMIN&&isFirebaseAdmin()){
+    clearTimeout(sharedWriteTimer);
+    sharedWriteTimer=setTimeout(publishSharedState,500);
+  }
+}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 function renderHome(){
   const box=document.getElementById('houses');
+  const count=document.getElementById('homeHouseCount');
+  if(count)count.textContent=state.houses.length+' บ้าน';
   box.innerHTML=state.houses.map((h,i)=>{
     const sel=h.members.filter(m=>m.sel).length;
     return `
-    <div class="hcard" style="--hc:${h.color}" onclick="openHouse(${i})">
+    <div class="hcard" style="--hc:${h.color};--delay:${i*65}ms" onclick="openHouse(${i},this)">
       <div class="hrow">
         <div class="badge">${i+1}</div>
-        <div class="go">เข้า →</div>
+        <div class="go">เปิดบ้าน <span aria-hidden="true">→</span></div>
       </div>
       <div>
         <div class="hn">${esc(h.name)||'(ไม่มีชื่อ)'}</div>
-        <div class="hcnt">เลือกแท็กไว้ ${sel}/5 · ${h.image?'มีรูป✓':'ยังไม่มีรูป'}</div>
+        <div class="hcnt">สมาชิก ${h.members.filter(m=>m.name&&m.name.trim()).length}/5 คน · เลือกแท็ก ${sel} คน</div>
       </div>
     </div>`;
   }).join('');
+  box.querySelectorAll('.hcard').forEach(card=>card.addEventListener('pointermove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--pointer-x',(e.clientX-r.left)+'px');
+    card.style.setProperty('--pointer-y',(e.clientY-r.top)+'px');
+  }));
 }
 
-function openHouse(i){
+let housePortalBusy=false;
+function openHouse(i,card){
+  if(housePortalBusy)return;
+  if(!card||window.matchMedia('(prefers-reduced-motion: reduce)').matches){showHouse(i);return;}
+  housePortalBusy=true;
+  card.classList.add('opening');
+  const rect=card.getBoundingClientRect();
+  const fx=document.createElement('div');
+  fx.className='portal-fx';
+  fx.setAttribute('aria-hidden','true');
+  fx.style.setProperty('--portal-x',(rect.left+rect.width/2)+'px');
+  fx.style.setProperty('--portal-y',(rect.top+rect.height/2)+'px');
+  const houseColor=state.houses[i]&&state.houses[i].color;
+  fx.style.setProperty('--portal-color',/^#[\da-f]{6}$/i.test(houseColor||'')?houseColor:'#38bdf8');
+  const particles=Array.from({length:18},(_,n)=>`<i style="--angle:${n*20}deg;--travel:${145+(n%5)*32}px;--delay:${(n%4)*24}ms">✦</i>`).join('');
+  fx.innerHTML=`<div class="portal-shade"></div><div class="portal-rings"><div class="portal-orbit"></div><div class="portal-orbit orbit-two"></div></div><div class="portal-core"><span class="portal-number">${i+1}</span><span class="portal-label">ENTERING HOUSE</span></div><div class="portal-particles">${particles}</div><div class="portal-flash"></div>`;
+  document.body.appendChild(fx);
+  requestAnimationFrame(()=>fx.classList.add('active'));
+  window.setTimeout(()=>{
+    showHouse(i);
+    fx.classList.add('exit');
+    window.setTimeout(()=>{fx.remove();housePortalBusy=false;},400);
+  },1080);
+}
+function showHouse(i){
   current=i;
   document.getElementById('view-home').classList.remove('active');
   document.getElementById('view-house').classList.add('active');
