@@ -466,23 +466,14 @@
 
   <div class="hookcard" id="hookcard">
     <div class="hookhdr">
-      <div class="t">🔗 ตั้งค่าห้อง Discord ของบ้านนี้</div>
-      <span class="status-chip unset" id="hook-chip">กำลังตรวจ</span>
+      <div class="t">🔐 ตั้งค่า Discord สำหรับบ้านนี้</div>
+      <span class="status-chip pending">ตั้งใน Vercel</span>
     </div>
-    <p class="hook-lead">ตั้งลิงก์ Webhook แยกตามบ้านได้เลย สมาชิกที่เลือกบ้านนี้จะส่งข้อความและรูปเข้าห้อง Discord ที่ตั้งไว้</p>
-    <label class="hook-input-label" for="d-hook">ลิงก์ Webhook ของบ้านนี้</label>
-    <div class="hookbody">
-      <input class="hook" id="d-hook" type="password" placeholder="วางลิงก์ Discord Webhook ที่คัดลอกจาก Discord" autocomplete="off" oninput="markWebhookEdited()" onkeydown="if(event.key==='Enter')saveWebhook()">
-      <button class="mini-btn" id="hook-toggle" onclick="toggleHook()" aria-label="แสดงหรือซ่อน Webhook">👁 แสดง</button>
-    </div>
-    <div class="hook-actions">
-      <button class="btn primary" id="hook-save" onclick="saveWebhook()">💾 บันทึก Webhook</button>
-      <button class="btn" id="hook-clear" onclick="clearWebhook()">ลบ Webhook บ้านนี้</button>
-    </div>
-    <div class="hook-state" id="hook-status" role="status" aria-live="polite">Webhook ถูกเก็บใน Firebase เฉพาะแอดมิน</div>
+    <p class="hook-lead">เพื่อให้สมาชิกทุกคนส่งเข้าห้อง Discord ได้อย่างปลอดภัย ให้แอดมินตั้งค่า Webhook เป็น Environment Variable ใน Vercel หนึ่งครั้ง</p>
+    <div class="hook-state pending">บ้านนี้ใช้ชื่อตัวแปร <b id="hook-env-name">DISCORD_WEBHOOK_1</b><br>เปิด Vercel → Project Settings → Environment Variables แล้วเพิ่มตัวแปรนี้และวาง Webhook เป็นค่า จากนั้น Redeploy</div>
     <details class="hook-help">
-      <summary>ยังไม่มีลิงก์? ดูวิธีคัดลอกจาก Discord</summary>
-      <ol><li>เปิด Discord แล้วเลือกห้องที่จะรับข้อมูล</li><li>เข้าแก้ไขห้อง → <b>Integrations</b> → <b>Webhooks</b></li><li>สร้างหรือเลือก Webhook แล้วกด <b>Copy Webhook URL</b></li><li>กลับมาวางลิงก์ในช่องด้านบน แล้วกด <b>บันทึก Webhook</b></li></ol>
+      <summary>วิธีตั้งค่าแบบสั้น</summary>
+      <ol><li>ใน Vercel เปิดโปรเจกต์เว็บนี้ → <b>Settings</b> → <b>Environment Variables</b></li><li>เพิ่มชื่อตัวแปรที่แสดงด้านบน แล้ววาง URL ของ Discord Webhook เป็นค่า</li><li>เลือก Production แล้วกด Save</li><li>ไปที่ Deployments แล้วกด Redeploy เวอร์ชันล่าสุด</li><li>บ้านอื่นใช้ชื่อ <b>DISCORD_WEBHOOK_2</b> ถึง <b>DISCORD_WEBHOOK_6</b></li></ol>
     </details>
   </div>
 
@@ -876,13 +867,7 @@ function renderHouse(){
   nameInp.value=h.name;nameInp.readOnly=!ADMIN;
   document.getElementById('adminbar').classList.toggle('hidden',!ADMIN);
   document.getElementById('hookcard').style.display=ADMIN?'':'none';
-  document.getElementById('d-hook').value='';
-  document.getElementById('d-hook').type='password';
-  document.getElementById('hook-toggle').textContent='👁 แสดง';
-  setHookStatus('กำลังโหลดค่าของบ้านนี้...','pending');
-  document.getElementById('hook-chip').textContent='กำลังตรวจ';
-  document.getElementById('hook-chip').className='status-chip unset';
-  if(ADMIN)loadWebhookForHouse(current);
+  document.getElementById('hook-env-name').textContent='DISCORD_WEBHOOK_'+(current+1);
 
   renderPhoto();
   document.getElementById('mlist').innerHTML=h.members.map((m,mi)=>memberRow(mi,m)).join('');
@@ -949,58 +934,6 @@ function clearPhoto(){
   state.houses[current].image='';save();renderHouse();toast('ลบรูปแล้ว','info');
 }
 
-function toggleHook(){
-  const input=document.getElementById('d-hook');
-  const button=document.getElementById('hook-toggle');
-  const reveal=input.type==='password';
-  input.type=reveal?'text':'password';
-  button.textContent=reveal?'🙈 ซ่อน':'👁 แสดง';
-}
-function validHook(u){return /^https:\/\/(discord(app)?\.com)\/api\/webhooks\/\d+\/[A-Za-z0-9._-]+(?:\?.*)?$/i.test((u||'').trim());}
-function setHookStatus(message,mode){
-  const status=document.getElementById('hook-status');
-  const chip=document.getElementById('hook-chip');
-  status.textContent=message;status.className='hook-state'+(mode==='set'?' set':mode==='pending'?' pending':'');
-  chip.className='status-chip '+(mode==='set'?'set':mode==='pending'?'pending':'unset');
-  chip.textContent=mode==='set'?'ตั้งค่าแล้ว':mode==='pending'?'ยังไม่บันทึก':'ยังไม่ตั้ง';
-}
-function markWebhookEdited(){
-  setHookStatus('มีการแก้ไข กด “บันทึก Webhook” เพื่อใช้กับสมาชิกทุกคน','pending');
-}
-async function loadWebhookForHouse(houseIndex){
-  if(!firebaseDb||!isFirebaseAdmin()){setHookStatus('เข้าสู่ระบบบัญชี Firebase แอดมินก่อนตั้งค่า','');return;}
-  try{
-    const snap=await firebaseDb.ref('privateConfig/webhooks/'+(houseIndex+1)).once('value');
-    if(current!==houseIndex)return;
-    const saved=snap.val()||state.houses[houseIndex].webhook||'';
-    document.getElementById('d-hook').value=saved;
-    setHookStatus(saved?'Webhook บ้านนี้พร้อมใช้งาน สมาชิกส่งเข้า Discord ได้':'ยังไม่ได้ตั้ง Webhook บ้านนี้',saved?'set':'');
-  }catch(e){setHookStatus('โหลดค่าไม่สำเร็จ กรุณาเข้าสู่ระบบ Firebase แอดมิน','');}
-}
-async function saveWebhook(){
-  const value=document.getElementById('d-hook').value.trim();
-  const houseIndex=current;
-  if(!isFirebaseAdmin()||!firebaseDb){toast('เข้าสู่ระบบ Firebase ด้วยบัญชีแอดมินก่อน','warn');return;}
-  if(!validHook(value)){toast('ลิงก์ Webhook ไม่ถูกต้อง','warn');return;}
-  try{
-    await firebaseDb.ref('privateConfig/webhooks/'+(houseIndex+1)).set(value);
-    state.houses[houseIndex].webhook='';save();
-    if(current===houseIndex)setHookStatus('บันทึกแล้ว สมาชิกทุกคนส่งเข้า Discord บ้านนี้ได้','set');
-    toast('บันทึก Webhook แล้ว','success');
-  }catch(e){toast('บันทึกไม่ได้: ตรวจสอบกฎ Firebase และบัญชีแอดมิน','error');}
-}
-async function clearWebhook(){
-  if(!isFirebaseAdmin()||!firebaseDb){toast('เข้าสู่ระบบ Firebase ด้วยบัญชีแอดมินก่อน','warn');return;}
-  if(!confirm('ลบ Webhook ของบ้านนี้หรือไม่? สมาชิกจะส่งเข้า Discord ไม่ได้จนกว่าจะตั้งใหม่'))return;
-  const houseIndex=current;
-  try{
-    await firebaseDb.ref('privateConfig/webhooks/'+(houseIndex+1)).remove();
-    state.houses[houseIndex].webhook='';save();
-    if(current===houseIndex){document.getElementById('d-hook').value='';setHookStatus('ลบ Webhook แล้ว','');}
-    toast('ลบ Webhook แล้ว','info');
-  }catch(e){toast('ลบไม่ได้: ตรวจสอบกฎ Firebase และบัญชีแอดมิน','error');}
-}
-
 document.addEventListener('paste',e=>{
   if(current<0)return;
   const items=(e.clipboardData||window.clipboardData).items;
@@ -1053,13 +986,13 @@ async function sendTag(){
   toast('กำลังส่งเข้า Discord...','loading');
   const ids=sel.filter(m=>m.did).map(m=>m.did);
   try{
-    const res=await fetch('https://asia-southeast1-tarsaray1.cloudfunctions.net/sendDiscord',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({house:current+1,content:tagText(h),users:ids,image:h.image})});
+    const res=await fetch('/api/sendDiscord',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({house:current+1,content:tagText(h),users:ids,image:h.image})});
     const result=await res.json().catch(()=>({}));
     if(!res.ok)throw new Error(result.error||'ส่งไม่สำเร็จ ('+res.status+')');
     toast('ส่งแท็ก + รูป เข้า Discord สำเร็จ','success');
     h.members.forEach(m=>m.sel=false);
     h.image='';save();renderHouse();
-  }catch(e){toast(e.message==='ยังไม่ได้ตั้งค่า Webhook ของบ้านนี้'?'แอดมินยังไม่ได้ตั้ง Webhook บ้านนี้ใน Firebase':e.message,'error');}
+  }catch(e){toast(e.message==='Failed to fetch'?'เชื่อมต่อระบบส่งไม่ได้ กรุณา Redeploy เว็บบน Vercel':e.message,'error');}
 }
 function copyTag(){
   const txt=tagText(state.houses[current]).replace(/\*\*/g,'').replace(/^> /gm,'');
