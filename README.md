@@ -2,7 +2,7 @@
 
 เว็บแอปสำหรับเลือกบ้าน → เลือกคนที่จะแท็ก → แนบรูป → ส่งเข้า Discord
 
-หน้าเว็บอยู่ใน `index.html` และมี API สำหรับส่ง Discord ที่ `api/send-discord.js`
+หน้าเว็บอยู่ใน `index.html`; Firebase Cloud Function เป็นตัวกลางส่งข้อมูลเข้า Discord โดยเก็บ Webhook ไว้ใน Realtime Database ที่แอดมินเท่านั้นอ่านได้
 
 ---
 
@@ -15,15 +15,21 @@
 
 ### 2) อัปโหลดไฟล์
 1. ในหน้า repo กด **Add file** → **Upload files**
-2. อัปโหลด `index.html`, `firebase-config.js`, `database.rules.json`, `README.md` และไฟล์ `api/send-discord.js` โดยต้องวางไฟล์ API ไว้ในโฟลเดอร์ชื่อ `api`
+2. อัปโหลด `index.html`, `firebase-config.js`, `database.rules.json`, `firebase.json`, `.firebaserc`, `README.md` และโฟลเดอร์ `functions` ที่มี `index.js` กับ `package.json`
 3. กด **Commit changes**
 
 ### 3) เชื่อม Vercel และ Deploy
 1. เชื่อม Repository นี้กับ Vercel แล้ว Deploy โปรเจกต์
-2. ตรวจว่า Vercel เห็นไฟล์ `api/send-discord.js` อยู่ในโฟลเดอร์ `api`
-3. แชร์ลิงก์ Vercel ให้สมาชิก
+2. แชร์ลิงก์ Vercel ให้สมาชิก
 
-> ระบบส่ง Discord ต้องใช้ Vercel เพราะ GitHub Pages ไม่รองรับ API ฝั่งเซิร์ฟเวอร์
+## Deploy Firebase Function สำหรับส่ง Discord
+
+การ Deploy Cloud Functions ต้องใช้แพ็กเกจ Firebase Blaze และบัญชีเรียกเก็บเงิน ซึ่งมีค่าใช้จ่ายตามการใช้งาน ควรตรวจราคาและตั้ง Budget alerts ก่อนเปิดใช้งาน ([เงื่อนไข Firebase](https://firebase.google.com/docs/functions/get-started))
+
+1. ติดตั้ง Node.js 20 และ Firebase CLI (`npm install -g firebase-tools`)
+2. เปิด PowerShell ในโฟลเดอร์โปรเจกต์ แล้วรัน `firebase login`
+3. รัน `firebase deploy --only functions,database`
+4. หลัง Deploy สำเร็จ เปิดเว็บจากโดเมน Vercel แล้วเข้าสู่ระบบแอดมิน
 
 ---
 
@@ -31,9 +37,9 @@
 - กดปุ่ม **🔒 แอดมิน** มุมขวาบน → ใส่รหัส **090889**
 - เฉพาะแอดมินเท่านั้นที่แก้ชื่อบ้าน / Discord ID ได้
 - คนทั่วไปเห็นแค่ชื่อสมาชิก เลือกแท็ก แนบรูป และส่งได้เท่านั้น
-- ตั้ง Webhook ใน Vercel → Project Settings → Environment Variables โดยใช้ชื่อตัวแปร `DISCORD_WEBHOOK_1` สำหรับบ้าน 1, `DISCORD_WEBHOOK_2` สำหรับบ้าน 2 ไล่ไปถึง `DISCORD_WEBHOOK_6` แล้ว Redeploy
-- ถ้าต้องการใช้ Webhook เดียวกันทุกบ้าน ให้ตั้ง `DISCORD_WEBHOOK_URL` แทน (ตัวแปรรายบ้านจะมีลำดับสำคัญกว่า)
-- อย่าวาง Webhook ในโค้ด, GitHub หรือ Firebase เพราะผู้เข้าชมอาจนำลิงก์ไปใช้ได้
+- เลือกบ้าน แล้วกรอก Webhook ในช่อง **ตั้งค่า Webhook ของบ้านนี้** จากนั้นกด **บันทึก** ทำซ้ำตามบ้านที่ต้องการ
+- ต้องเข้าสู่ระบบด้วยบัญชี Firebase Admin ที่ UID ตรงกับ `firebaseAdminUid` ก่อนตั้งค่า
+- ห้ามเปิดสิทธิ์อ่าน `privateConfig` ให้สาธารณะ และอย่าวาง Webhook ใน GitHub หรือแชต
 
 ### เปลี่ยนรหัสแอดมิน
 เปิดไฟล์ `index.html` → ค้นหาบรรทัด `const ADMIN_PIN='090889';` → แก้เลขในเครื่องหมายคำพูด
@@ -47,7 +53,7 @@
 
 เมื่อแอดมินกด 🔒 ใส่ PIN และเข้าสู่ระบบ Firebase แล้ว การแก้ชื่อบ้าน/สมาชิกจะซิงก์ให้ผู้เข้าชมทุกคนแบบเรียลไทม์ ผู้เข้าชมทั่วไปอ่านข้อมูลร่วมได้ แต่เขียนไม่ได้ ปุ่มสำรอง/กู้คืนยังใช้สำหรับสำรองส่วนตัวตามบัญชี Firebase
 
-ข้อมูลที่อ่านร่วมได้ประกอบด้วยโลโก้ ชื่อบ้าน ชื่อสมาชิก และ Discord ID; Webhook เก็บเป็น Environment Variable ฝั่ง Vercel และรูปแนบส่งผ่าน API ชั่วคราว ไม่ถูกบันทึกใน Firebase
+ข้อมูลสาธารณะร่วมกันประกอบด้วยโลโก้ ชื่อบ้าน ชื่อสมาชิก และ Discord ID; Webhook อยู่ที่ `privateConfig/webhooks` ซึ่งกฎ Firebase อนุญาตให้อ่าน/เขียนได้เฉพาะแอดมิน ส่วนรูปแนบส่งผ่าน Cloud Function ชั่วคราวและไม่บันทึกใน Firebase
 
 ## หมายเหตุ
 - localStorage ใช้เก็บสำเนาในเครื่อง; ข้อมูลหลักอ่านจาก Firebase เพื่อให้ผู้ใช้เห็นข้อมูลชุดเดียวกัน

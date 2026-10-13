@@ -257,20 +257,34 @@
   .did:focus{border-color:var(--cyan);color:var(--txt)}
   .did::placeholder{color:#4b5a7c}
 
-  .hookcard{margin-top:16px;border:1px solid var(--line);border-radius:16px;padding:13px;background:var(--panel);backdrop-filter:blur(10px)}
-  .hookhdr{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .hookhdr .t{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-  .hooktools{display:flex;gap:6px}
-  .hookbody{margin-top:10px;display:flex;gap:6px}
+  .hookcard{margin-top:18px;border:1px solid rgba(34,211,238,.25);border-radius:20px;padding:18px;
+    background:linear-gradient(145deg,rgba(13,26,43,.94),rgba(10,15,29,.94));box-shadow:0 14px 36px rgba(0,0,0,.22)}
+  .hookhdr{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .hookhdr .t{font-size:15px;font-weight:800;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .hookbody{margin-top:14px;display:flex;gap:8px;align-items:stretch}
   .hookbody.hidden{display:none}
-  .hook{flex:1;background:rgba(6,12,22,.6);border:1px solid var(--line);color:var(--muted);padding:9px 11px;
-    border-radius:10px;font-size:11px;outline:none;font-family:ui-monospace,Consolas,monospace}
-  .hook:focus{border-color:var(--cyan);color:var(--txt)}
-  .hookhint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .hook{width:100%;min-width:0;background:rgba(4,10,20,.72);border:1px solid #293a55;color:var(--txt);padding:12px 14px;
+    border-radius:12px;font-size:12px;outline:none;font-family:ui-monospace,Consolas,monospace;transition:border-color .18s,box-shadow .18s}
+  .hook:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.12)}
+  .hookhint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.65}
   .hookhint.hidden{display:none}
+  .hook-lead{font-size:12px;color:var(--muted);line-height:1.65;margin:7px 0 13px}
+  .hook-input-label{display:block;font-size:12px;font-weight:700;margin-bottom:7px;color:#d9e7fb}
+  .hook-actions{display:flex;gap:8px;margin-top:10px}
+  .hook-actions .btn{justify-content:center;min-height:42px}
+  .hook-state{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px;margin-top:12px;min-height:20px}
+  .hook-state::before{content:'';width:8px;height:8px;border-radius:50%;background:#64748b;box-shadow:0 0 10px currentColor}
+  .hook-state.set{color:#4ade80}.hook-state.set::before{background:#4ade80}
+  .hook-state.pending{color:#fbbf24}.hook-state.pending::before{background:#fbbf24}
+  .hook-help{margin-top:13px;border-top:1px solid rgba(134,152,182,.14);padding-top:11px;color:var(--muted);font-size:12px}
+  .hook-help summary{cursor:pointer;color:#a5c8ef;font-weight:700;list-style:none}
+  .hook-help summary::-webkit-details-marker{display:none}
+  .hook-help ol{padding-left:20px;margin:9px 0 2px;line-height:1.8}
+  @media(max-width:520px){.hookcard{padding:14px}.hookbody{gap:6px}.hook-actions{flex-direction:column}.hook-actions .btn{width:100%}}
   .status-chip{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700}
   .status-chip.set{background:rgba(34,197,94,.16);color:#22c55e}
   .status-chip.unset{background:var(--panel2);color:var(--muted)}
+  .status-chip.pending{background:rgba(251,191,36,.14);color:#fbbf24}
 
   .btn{border:1px solid var(--line);background:var(--panel2);color:var(--txt);padding:12px 16px;
     border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;
@@ -452,15 +466,24 @@
 
   <div class="hookcard" id="hookcard">
     <div class="hookhdr">
-      <div class="t">🔗 ตั้งค่าปลายทาง Discord</div>
+      <div class="t">🔗 ตั้งค่าห้อง Discord ของบ้านนี้</div>
+      <span class="status-chip unset" id="hook-chip">กำลังตรวจ</span>
     </div>
-    <div class="hookhint">ตั้ง Webhook ของแต่ละบ้านใน Vercel → Project Settings → Environment Variables<br>บ้าน 1 ใช้ <code>DISCORD_WEBHOOK_1</code> · บ้าน 2 ใช้ <code>DISCORD_WEBHOOK_2</code> ไล่ไปจนถึงบ้าน 6 แล้วกด Redeploy<br>ถ้าเคยตั้ง Webhook ในเว็บบนเครื่องนี้ ให้คัดลอกค่าด้านล่างไปใส่ใน Vercel ก่อน จากนั้นค่อยลบค่าที่เก่าออก<br>สมาชิกทุกคนจะส่งเข้าห้องของบ้านที่เลือกได้ โดยไม่เห็นลิงก์ Webhook</div>
-    <div id="legacy-hook-wrap" class="hookbody" style="display:none">
-      <input class="hook" id="legacy-hook" type="password" readonly aria-label="Webhook เดิมที่บันทึกในเครื่องนี้">
-      <button class="mini-btn" id="legacy-hook-toggle" onclick="toggleLegacyHook()">👁 แสดง</button>
-      <button class="mini-btn" onclick="copyLegacyHook()">📋 คัดลอก</button>
-      <button class="mini-btn danger" onclick="clearLegacyHook()">ลบของเก่า</button>
+    <p class="hook-lead">ตั้งลิงก์ Webhook แยกตามบ้านได้เลย สมาชิกที่เลือกบ้านนี้จะส่งข้อความและรูปเข้าห้อง Discord ที่ตั้งไว้</p>
+    <label class="hook-input-label" for="d-hook">ลิงก์ Webhook ของบ้านนี้</label>
+    <div class="hookbody">
+      <input class="hook" id="d-hook" type="password" placeholder="วางลิงก์ Discord Webhook ที่คัดลอกจาก Discord" autocomplete="off" oninput="markWebhookEdited()" onkeydown="if(event.key==='Enter')saveWebhook()">
+      <button class="mini-btn" id="hook-toggle" onclick="toggleHook()" aria-label="แสดงหรือซ่อน Webhook">👁 แสดง</button>
     </div>
+    <div class="hook-actions">
+      <button class="btn primary" id="hook-save" onclick="saveWebhook()">💾 บันทึก Webhook</button>
+      <button class="btn" id="hook-clear" onclick="clearWebhook()">ลบ Webhook บ้านนี้</button>
+    </div>
+    <div class="hook-state" id="hook-status" role="status" aria-live="polite">Webhook ถูกเก็บใน Firebase เฉพาะแอดมิน</div>
+    <details class="hook-help">
+      <summary>ยังไม่มีลิงก์? ดูวิธีคัดลอกจาก Discord</summary>
+      <ol><li>เปิด Discord แล้วเลือกห้องที่จะรับข้อมูล</li><li>เข้าแก้ไขห้อง → <b>Integrations</b> → <b>Webhooks</b></li><li>สร้างหรือเลือก Webhook แล้วกด <b>Copy Webhook URL</b></li><li>กลับมาวางลิงก์ในช่องด้านบน แล้วกด <b>บันทึก Webhook</b></li></ol>
+    </details>
   </div>
 
   <div style="height:14px"></div>
@@ -853,10 +876,13 @@ function renderHouse(){
   nameInp.value=h.name;nameInp.readOnly=!ADMIN;
   document.getElementById('adminbar').classList.toggle('hidden',!ADMIN);
   document.getElementById('hookcard').style.display=ADMIN?'':'none';
-  document.getElementById('legacy-hook-wrap').style.display=h.webhook?'flex':'none';
-  document.getElementById('legacy-hook').value=h.webhook||'';
-  document.getElementById('legacy-hook').type='password';
-  document.getElementById('legacy-hook-toggle').textContent='👁 แสดง';
+  document.getElementById('d-hook').value='';
+  document.getElementById('d-hook').type='password';
+  document.getElementById('hook-toggle').textContent='👁 แสดง';
+  setHookStatus('กำลังโหลดค่าของบ้านนี้...','pending');
+  document.getElementById('hook-chip').textContent='กำลังตรวจ';
+  document.getElementById('hook-chip').className='status-chip unset';
+  if(ADMIN)loadWebhookForHouse(current);
 
   renderPhoto();
   document.getElementById('mlist').innerHTML=h.members.map((m,mi)=>memberRow(mi,m)).join('');
@@ -923,23 +949,56 @@ function clearPhoto(){
   state.houses[current].image='';save();renderHouse();toast('ลบรูปแล้ว','info');
 }
 
-function toggleLegacyHook(){
-  const input=document.getElementById('legacy-hook');
-  const button=document.getElementById('legacy-hook-toggle');
+function toggleHook(){
+  const input=document.getElementById('d-hook');
+  const button=document.getElementById('hook-toggle');
   const reveal=input.type==='password';
   input.type=reveal?'text':'password';
   button.textContent=reveal?'🙈 ซ่อน':'👁 แสดง';
 }
-async function copyLegacyHook(){
-  const value=state.houses[current].webhook||'';
-  if(!value){toast('ไม่พบ Webhook เดิมในเครื่องนี้','warn');return;}
-  try{await navigator.clipboard.writeText(value);toast('คัดลอกแล้ว นำไปใส่ใน Vercel Environment Variables','success');}
-  catch(_){const input=document.getElementById('legacy-hook');input.type='text';input.select();document.execCommand('copy');input.type='password';toast('คัดลอกแล้ว นำไปใส่ใน Vercel Environment Variables','success');}
+function validHook(u){return /^https:\/\/(discord(app)?\.com)\/api\/webhooks\/\d+\/[A-Za-z0-9._-]+(?:\?.*)?$/i.test((u||'').trim());}
+function setHookStatus(message,mode){
+  const status=document.getElementById('hook-status');
+  const chip=document.getElementById('hook-chip');
+  status.textContent=message;status.className='hook-state'+(mode==='set'?' set':mode==='pending'?' pending':'');
+  chip.className='status-chip '+(mode==='set'?'set':mode==='pending'?'pending':'unset');
+  chip.textContent=mode==='set'?'ตั้งค่าแล้ว':mode==='pending'?'ยังไม่บันทึก':'ยังไม่ตั้ง';
 }
-function clearLegacyHook(){
-  if(!state.houses[current].webhook){toast('ไม่พบ Webhook เดิมในเครื่องนี้','warn');return;}
-  if(!confirm('ลบ Webhook เก่าที่บันทึกไว้ในเครื่องนี้? ตรวจว่าตั้งค่าใน Vercel แล้วก่อนลบ'))return;
-  state.houses[current].webhook='';save();renderHouse();toast('ลบ Webhook เก่าจากเครื่องนี้แล้ว','info');
+function markWebhookEdited(){
+  setHookStatus('มีการแก้ไข กด “บันทึก Webhook” เพื่อใช้กับสมาชิกทุกคน','pending');
+}
+async function loadWebhookForHouse(houseIndex){
+  if(!firebaseDb||!isFirebaseAdmin()){setHookStatus('เข้าสู่ระบบบัญชี Firebase แอดมินก่อนตั้งค่า','');return;}
+  try{
+    const snap=await firebaseDb.ref('privateConfig/webhooks/'+(houseIndex+1)).once('value');
+    if(current!==houseIndex)return;
+    const saved=snap.val()||state.houses[houseIndex].webhook||'';
+    document.getElementById('d-hook').value=saved;
+    setHookStatus(saved?'Webhook บ้านนี้พร้อมใช้งาน สมาชิกส่งเข้า Discord ได้':'ยังไม่ได้ตั้ง Webhook บ้านนี้',saved?'set':'');
+  }catch(e){setHookStatus('โหลดค่าไม่สำเร็จ กรุณาเข้าสู่ระบบ Firebase แอดมิน','');}
+}
+async function saveWebhook(){
+  const value=document.getElementById('d-hook').value.trim();
+  const houseIndex=current;
+  if(!isFirebaseAdmin()||!firebaseDb){toast('เข้าสู่ระบบ Firebase ด้วยบัญชีแอดมินก่อน','warn');return;}
+  if(!validHook(value)){toast('ลิงก์ Webhook ไม่ถูกต้อง','warn');return;}
+  try{
+    await firebaseDb.ref('privateConfig/webhooks/'+(houseIndex+1)).set(value);
+    state.houses[houseIndex].webhook='';save();
+    if(current===houseIndex)setHookStatus('บันทึกแล้ว สมาชิกทุกคนส่งเข้า Discord บ้านนี้ได้','set');
+    toast('บันทึก Webhook แล้ว','success');
+  }catch(e){toast('บันทึกไม่ได้: ตรวจสอบกฎ Firebase และบัญชีแอดมิน','error');}
+}
+async function clearWebhook(){
+  if(!isFirebaseAdmin()||!firebaseDb){toast('เข้าสู่ระบบ Firebase ด้วยบัญชีแอดมินก่อน','warn');return;}
+  if(!confirm('ลบ Webhook ของบ้านนี้หรือไม่? สมาชิกจะส่งเข้า Discord ไม่ได้จนกว่าจะตั้งใหม่'))return;
+  const houseIndex=current;
+  try{
+    await firebaseDb.ref('privateConfig/webhooks/'+(houseIndex+1)).remove();
+    state.houses[houseIndex].webhook='';save();
+    if(current===houseIndex){document.getElementById('d-hook').value='';setHookStatus('ลบ Webhook แล้ว','');}
+    toast('ลบ Webhook แล้ว','info');
+  }catch(e){toast('ลบไม่ได้: ตรวจสอบกฎ Firebase และบัญชีแอดมิน','error');}
 }
 
 document.addEventListener('paste',e=>{
@@ -994,13 +1053,13 @@ async function sendTag(){
   toast('กำลังส่งเข้า Discord...','loading');
   const ids=sel.filter(m=>m.did).map(m=>m.did);
   try{
-    const res=await fetch('/api/send-discord',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({house:current+1,content:tagText(h),users:ids,image:h.image})});
+    const res=await fetch('https://asia-southeast1-tarsaray1.cloudfunctions.net/sendDiscord',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({house:current+1,content:tagText(h),users:ids,image:h.image})});
     const result=await res.json().catch(()=>({}));
     if(!res.ok)throw new Error(result.error||'ส่งไม่สำเร็จ ('+res.status+')');
     toast('ส่งแท็ก + รูป เข้า Discord สำเร็จ','success');
     h.members.forEach(m=>m.sel=false);
     h.image='';save();renderHouse();
-  }catch(e){toast(e.message==='ยังไม่ได้ตั้งค่า Webhook ของบ้านนี้'?'แอดมินยังไม่ได้ตั้ง Webhook บ้านนี้ใน Vercel':e.message,'error');}
+  }catch(e){toast(e.message==='ยังไม่ได้ตั้งค่า Webhook ของบ้านนี้'?'แอดมินยังไม่ได้ตั้ง Webhook บ้านนี้ใน Firebase':e.message,'error');}
 }
 function copyTag(){
   const txt=tagText(state.houses[current]).replace(/\*\*/g,'').replace(/^> /gm,'');

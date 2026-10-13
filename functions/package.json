@@ -1,0 +1,13 @@
+{
+  "name": "diamondhead-functions",
+  "description": "Private Discord webhook relay for Diamondhead",
+  "main": "index.js",
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.3.2"
+  },
+  "private": true
+}
