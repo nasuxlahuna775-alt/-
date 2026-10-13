@@ -923,7 +923,35 @@ function selectAll(v){state.houses[current].members.forEach(m=>m.sel=v);save();r
 function setName(v){state.houses[current].name=v;save();}
 function setMember(mi,v){state.houses[current].members[mi].name=v;save();}
 function setDid(mi,v){state.houses[current].members[mi].did=v.replace(/[^0-9]/g,'');save();}
-function readImg(file,cb){const r=new FileReader();r.onload=e=>cb(e.target.result);r.readAsDataURL(file);}
+function readImg(file,cb){
+  if(!file||!file.type||!file.type.startsWith('image/')){toast('ไฟล์นี้ไม่ใช่รูปภาพ','error');return;}
+  const r=new FileReader();
+  r.onerror=()=>toast('อ่านไฟล์รูปไม่สำเร็จ','error');
+  r.onload=()=>{
+    const original=r.result;
+    // Keep small GIFs animated; large images are resized and converted before upload.
+    if(file.type==='image/gif'&&file.size<=1300000){cb(original);return;}
+    const img=new Image();
+    img.onerror=()=>toast('เปิดรูปนี้ไม่ได้ กรุณาเลือกรูปอื่น','error');
+    img.onload=()=>{
+      const maxSide=1500,scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
+      canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+      const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      let quality=.84,data=canvas.toDataURL('image/webp',quality);
+      while(data.length>1850000&&quality>.55){quality-=.08;data=canvas.toDataURL('image/webp',quality);}
+      if(data.length>1850000){
+        canvas.width=Math.round(canvas.width*.8);canvas.height=Math.round(canvas.height*.8);
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);data=canvas.toDataURL('image/webp',.62);
+      }
+      if(data.length>1850000){toast('รูปยังใหญ่เกินไป ลองเลือกรูปที่เล็กกว่านี้','error');return;}
+      cb(data);
+    };
+    img.src=original;
+  };
+  r.readAsDataURL(file);
+}
 function pickPhoto(){
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
   inp.onchange=()=>{const f=inp.files[0];if(!f)return;readImg(f,d=>{state.houses[current].image=d;save();renderHouse();toast('แนบรูปแล้ว พร้อมส่ง','success');});};

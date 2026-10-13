@@ -1,4 +1,4 @@
-const MAX_IMAGE_BYTES = 2_500_000;
+const MAX_IMAGE_BYTES = 1_400_000;
 const WEBHOOK_RE = /^https:\/\/(?:discord\.com|discordapp\.com)\/api\/webhooks\/\d+\/[A-Za-z0-9._-]+(?:\?.*)?$/i;
 
 function reply(res, status, body) {
